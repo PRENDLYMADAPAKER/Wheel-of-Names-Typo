@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TYPO/CAST Wheel of Clinical Instructors</title>
+<style>
+  :root{
+    --primary:#1e88e5;
+    --primary-dark:#1565c0;
+    --accent:#26a69a;
+    --danger:#d32f2f;
+    --bg:#f3f5f8;
+    --card:#ffffff;
+    --text:#243243;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+  }
+  header{
+    background:var(--primary); color:#fff; padding:14px 16px; text-align:center;
+    font-weight:600; letter-spacing:.2px;
+  }
+  .container{max-width:1100px; margin:20px auto; padding:0 14px;}
+  .grid{display:grid; grid-template-columns:1fr; gap:16px;}
+  @media(min-width:920px){ .grid{grid-template-columns:420px 1fr;} }
+
+  .card{
+    background:var(--card); border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.06);
+    padding:16px; margin-bottom: 16px;
+  }
+
+  /* Wheel */
+  .wheel-wrap{display:flex; flex-direction:column; align-items:center; position:relative;}
+  canvas{display:block; margin:auto; background:#fff; border-radius:50%;
+    box-shadow:0 6px 18px rgba(0,0,0,.08);}
+  .wheel-pointer-icon {
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 22px solid var(--danger);
+    margin-bottom: -4px;
+    z-index: 10;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+  }
+  .pointer{margin-top:6px; color:#555; font-size:14px}
+  .controls{margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center}
+  .btn{
+    border:none; background:var(--primary); color:#fff; padding:10px 14px; border-radius:10px;
+    cursor:pointer; font-weight:600; transition:.2s transform, .25s background;
+  }
+  .btn:hover{background:var(--primary-dark)}
+  .btn:active{transform:scale(.98)}
+  .btn-outline{background:#fff; color:var(--primary); border:2px solid var(--primary)}
+  .btn-danger{background:var(--danger)}
+  .btn-muted{background:#90a4ae}
+  .btn-muted:hover{background:#7b8e99}
+
+  /* Instructor Button Grid */
+  .instructor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .instructor-btn {
+    background: var(--accent);
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+  }
+  .instructor-btn:hover { background: #1d8a7a; transform: translateY(-2px); }
+  .instructor-btn:disabled { background: #cfd8dc; color: #455a64; cursor: not-allowed; }
+
+  /* Tags */
+  .tagbox{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+  .tag{
+    display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+    background:#e3f2fd; color:#0d47a1; font-weight:600; font-size:14px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+  }
+  .tag button{
+    border:none; background:transparent; color:#0d47a1; font-weight:700; cursor:pointer;
+  }
+
+  /* Form */
+  form .row{display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px}
+  @media(min-width:680px){ form .row{grid-template-columns:1.5fr 1fr 1.5fr} }
+  label{font-size:12px; font-weight:700; color:#637381; display:block; margin-bottom:6px}
+  input[type="text"], select{
+    width:100%; padding:10px 12px; border:1px solid #dfe3e8; border-radius:10px; outline:none;
+  }
+  .form-actions{margin-top:10px; display:flex; flex-wrap:wrap; gap:8px}
+
+  /* Table */
+  table{width:100%; border-collapse:collapse; margin-top:10px; background:#fff;
+    border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.05)}
+  thead th{
+    background:var(--primary); color:#fff; padding:10px; font-weight:700; text-align:center;
+  }
+  tbody td{padding:10px; border-bottom:1px solid #eef2f5; text-align:center}
+  tbody tr:nth-child(even){background:#fafbfd}
+  td[contenteditable="true"]{background:#fffdf4}
+  .actions .btn{padding:6px 10px; border-radius:8px; font-size:13px}
+
+  .toolbar{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+  .note{font-size:12px; color:#6b7c8a}
+
+  /* Group Header */
+  .group-header td { cursor:pointer; }
+  .group-header .arrow { font-weight:bold; margin-right:6px; }
+
+  /* Dental Chair Timer Styles */
+  .timer-control-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+    background: #f7f9fc;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #eef2f5;
+  }
+  .timer-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .timer-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .timer-btn:hover { background: #1d8a7a; }
+  .timer-btn-inc { background: #ab47bc; }
+  .timer-btn-inc:hover { background: #8e24aa; }
+  .timer-btn-stop { background: var(--danger); }
+  .timer-btn-stop:hover { background: #b71c1c; }
+
+  .chairs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .chair-card {
+    background: #fafbfd;
+    border: 2px solid #dfe3e8;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chair-card:hover { border-color: var(--primary); }
+  .chair-card.active {
+    background: #e3f2fd;
+    border-color: var(--primary);
+  }
+  .chair-card.expired {
+    background: #ffebee;
+    border-color: var(--danger);
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  .chair-title { font-weight: 700; font-size: 14px; color: var(--text); }
+  .chair-time { font-size: 16px; font-weight: bold; margin: 4px 0; color: var(--primary-dark); }
+  .chair-status { font-size: 11px; color: #637381; }
+</style>
+</head>
+<body>
+<header>Wheel of Clinical Instructors</header>
+
+<div class="container">
+  <div class="grid">
+    <!-- Left: Wheel + Instructor buttons -->
+    <section class="card">
+      <h3 style="margin:0 0 8px">Clinical Instructor Wheel</h3>
+      <div class="wheel-wrap">
+        <div class="wheel-pointer-icon"></div>
+        <canvas id="wheel" width="360" height="360" aria-label="Wheel of Names"></canvas>
+        <div class="pointer">▲ The arrow points to the selected instructor</div>
+        <div class="controls">
+          <button class="btn" id="spinBtn">Spin (5s)</button>
+          <button class="btn btn-outline" id="removePickedBtn" disabled>Remove Picked Instructor</button>
+        </div>
+        <div class="controls" style="margin-top:8px;">
+          <button class="btn btn-outline" id="saveInstructorsBtn" type="button" title="Save current instructors as preset">Save Instructors</button>
+          <button class="btn btn-muted" id="resetInstructorsBtn" type="button" title="Restore saved instructors to wheel">Reset Wheel</button>
+          <button class="btn btn-danger" id="removeAllBtn" type="button" title="Remove all instructors from wheel">Remove All</button>
+        </div>
+      </div>
+
+      <h4 style="margin:14px 0 6px">Select Clinical Instructors</h4>
+      <div id="instructorGrid" class="instructor-grid"></div>
+      <div id="tagBox" class="tagbox"></div>
+      <div class="note">Tip: Click ❌ on a tag to remove that instructor from the wheel.</div>
+    </section>
+
+    <!-- Right: Form + Dental Chair Timer -->
+    <div>
+      <!-- Waiting List Section -->
+      <div style="margin-bottom: 8px;">
+        <button class="btn btn-outline" id="toggleWaitlistBtn" type="button" style="width: 100%; font-size: 13px; padding: 8px;">Open Waiting List</button>
+      </div>
+      <section class="card" id="waitlistCard" style="display: none; background:#f8fafc; border:1px solid #e2e8f0;">
+        <h3 style="margin:0 0 8px; color:var(--primary-dark);">Waiting List</h3>
+        <div class="row" style="grid-template-columns:1fr; gap:8px;">
+          <div>
+            <label>Clinician Name</label>
+            <input id="waitClinicianName" type="text" list="clinicianList" placeholder="Search clinician name" autocomplete="off" />
+          </div>
+        </div>
+        <div class="row" style="grid-template-columns:1fr; margin-top:8px;">
+          <div>
+            <label>Clinical Procedure</label>
+            <input id="waitProcedure" type="text" placeholder="Enter clinical procedure" />
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn" id="addToWaitlistBtn" type="button" style="padding:8px 12px; font-size:13px;">Add to Waiting List</button>
+        </div>
+
+        <table id="waitlistTable" aria-label="Waiting list table" style="font-size:13px; margin-top:10px;">
+          <thead>
+            <tr>
+              <th>Clinician Name</th>
+              <th>Clinical Procedure</th>
+              <th class="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="waitlistBody"></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h3 style="margin:0 0 8px">Record Details</h3>
+        <form id="entryForm" onsubmit="return false;">
+          <div class="row">
+            <div>
+              <label>Your Clinical Instructor</label>
+              <input id="pickedInstructor" type="text" placeholder="Spin wheel or type instructor" />
+            </div>
+            <div>
+              <label>Clinical Level</label>
+              <select id="clinicalLevel">
+                <option value="42">42</option>
+                <option value="41">41</option>
+                <option value="32">32</option>
+                <option value="31">31</option>
+              </select>
+            </div>
+            <div>
+              <label>Clinician Name</label>
+              <input id="clinicianName" type="text" list="clinicianList" placeholder="Type or search clinician name" autocomplete="off" />
+              <datalist id="clinicianList">
+                <option value="Aguilera, Jason" data-level="41"></option>
+                <option value="Alay, D. Loruelle" data-level="41"></option>
+                <option value="Alay, M. Donuelle" data-level="41"></option>
+                <option value="Alinton, Even Marelle" data-level="41"></option>
+                <option value="Aquino, Adriane" data-level="41"></option>
+                <option value="Aratuc, Hasna Rani, Jason" data-level="41"></option>
+                <option value="Aripin, Fatima" data-level="41"></option>
+                <option value="Asal, Jessamine" data-level="41"></option>
+                <option value="Asuncion, Marco" data-level="41"></option>
+                <option value="Balbuena, Jelianne" data-level="41"></option>
+                <option value="Baliling, Tatum Louise" data-level="41"></option>
+                <option value="Barriga, Kara Crystel" data-level="41"></option>
+                <option value="Basco, Aleck Shaine" data-level="41"></option>
+                <option value="Belonio, Anaphy" data-level="41"></option>
+                <option value="Billano, Rony Jr." data-level="41"></option>
+                <option value="Bismanos, Ella Monica" data-level="41"></option>
+                <option value="Canono, Janna Elyssa" data-level="41"></option>
+                <option value="Cerbo, Queenee Joy" data-level="41"></option>
+                <option value="Constancio, Jorme" data-level="41"></option>
+                <option value="Dalumpines, Janelle Kay" data-level="41"></option>
+                <option value="Dela Rosa, Lianne" data-level="41"></option>
+                <option value="Dennison Miles" data-level="41"></option>
+                <option value="Dollete, Romalie" data-level="41"></option>
+                <option value="Ecat, Joshua" data-level="41"></option>
+                <option value="Ectin, Yzza" data-level="41"></option>
+                <option value="Eltagonde Janriz" data-level="41"></option>
+                <option value="Estilo, Joella Jaicel" data-level="41"></option>
+                <option value="Gabutan, Moisesah Faye" data-level="41"></option>
+                <option value="Garcia, Ailee Marielle" data-level="41"></option>
+                <option value="Garcia, Armaine Hazzly" data-level="41"></option>
+                <option value="Gonzales, Fatima Almaira" data-level="41"></option>
+                <option value="Herrera, Jana Myles Therese" data-level="41"></option>
+                <option value="Horcera, Alloysius Karl" data-level="41"></option>
+                <option value="Inguillo, Maxelle Andre" data-level="41"></option>
+                <option value="Jamorabon, Mary Kymm" data-level="41"></option>
+                <option value="Jancilan, Alex Andrea" data-level="41"></option>
+                <option value="Junasa, JV James" data-level="41"></option>
+                <option value="Kusain, Jennifer" data-level="41"></option>
+                <option value="Lacag, Lara Kyle" data-level="41"></option>
+                <option value="Lagarde, Febe" data-level="41"></option>
+                <option value="Laurina, Cristine" data-level="41"></option>
+                <option value="Leonor, Rosenette" data-level="41"></option>
+                <option value="Licayan, Sim Jeca" data-level="41"></option>
+                <option value="Longino, Gilmart" data-level="41"></option>
+                <option value="Lu, Sarah Sofia" data-level="41"></option>
+                <option value="Maturan, Kathleen" data-level="41"></option>
+                <option value="Mejorada, Crystal" data-level="41"></option>
+                <option value="Mendi, Joanne" data-level="41"></option>
+                <option value="Mercadera, Reynah Alexa" data-level="41"></option>
+                <option value="Miranda, Magnedylle" data-level="41"></option>
+                <option value="Mojado, Nicolette" data-level="41"></option>
+                <option value="Montero, Thea Margarette" data-level="41"></option>
+                <option value="Nini, Nelvin Jr." data-level="41"></option>
+                <option value="Olaivar, Hyanica" data-level="41"></option>
+                <option value="Omaña, Gzil Marie" data-level="41"></option>
+                <option value="Pacis, Florence Emil" data-level="41"></option>
+                <option value="Pagallaman, Liezl" data-level="41"></option>
+                <option value="Penales, Feb Monaleigh" data-level="41"></option>
+                <option value="Punla, Christine Mae" data-level="41"></option>
+                <option value="Quibo, Flovin" data-level="41"></option>
+                <option value="Quintero, Cherry Sai" data-level="41"></option>
+                <option value="Ranido, Demili Claudia" data-level="41"></option>
+                <option value="Revil, Jason" data-level="41"></option>
+                <option value="Rosal, Alexandra Joanne" data-level="41"></option>
+                <option value="Sayritan, Princess" data-level="41"></option>
+                <option value="Serad, Rowalaine Rose" data-level="41"></option>
+                <option value="Sionosa, Johnrick" data-level="41"></option>
+                <option value="Sustino, Febie Kaye" data-level="41"></option>
+                <option value="Tolete, Rommel" data-level="41"></option>
+                <option value="Tudon, Sittie Arniza" data-level="41"></option>
+                <option value="Vargas, Claire Angela" data-level="41"></option>
+                <option value="Yap, Cheska Denise" data-level="41"></option>
+                <option value="Yumang, Daniel Josh" data-level="41"></option>
+                <option value="Zerrudo, Lyza Mae" data-level="41"></option>
+                <option value="Caya, Neil Justine" data-level="42"></option>
+                <option value="Diana, Duke Grant" data-level="42"></option>
+                <option value="Fukuda, Bryan" data-level="42"></option>
+                <option value="Manlangit, Basil Joseph" data-level="42"></option>
+                <option value="Montalban, Gemarie" data-level="42"></option>
+                <option value="Piccio, Kristine Mae" data-level="42"></option>
+                <option value="Rañeses, Matt Earl" data-level="42"></option>
+                <option value="Sombilon, Gabrielle" data-level="42"></option>
+                <option value="Abad, Sheena Mae" data-level="32"></option>
+                <option value="Abas, Hisham" data-level="32"></option>
+                <option value="Alloro, Yasmin Cyril" data-level="32"></option>
+                <option value="Ampong, Jade" data-level="32"></option>
+                <option value="Ang, Jana Elisha" data-level="32"></option>
+                <option value="Apale, Christian" data-level="32"></option>
+                <option value="Aracan, Kamille Faye" data-level="32"></option>
+                <option value="Arado, Jea Nicole" data-level="32"></option>
+                <option value="Arancon, Diana Threa" data-level="32"></option>
+                <option value="Bacas, Juliana" data-level="32"></option>
+                <option value="Bantique, Harold Domaynique" data-level="32"></option>
+                <option value="Barroga, Julliene Therese " data-level="32"></option>
+                <option value="Basilio, Princess Kenneth" data-level="32"></option>
+                <option value="Bastida, Cassey Andreah" data-level="32"></option>
+                <option value="Belaya, Rhea Rose" data-level="32"></option>
+                <option value="Bernardo, Ruben" data-level="32"></option>
+                <option value="Biore, Mart Avel" data-level="32"></option>
+                <option value="Carigaba, Patricia Nhicole" data-level="32"></option>
+                <option value="Carsula, Queenee Bea Irish" data-level="32"></option>
+                <option value="Casilac, Kristine Joy" data-level="32"></option>
+                <option value="Castillon, Charlyn" data-level="32"></option>
+                <option value="Cejas, Maria Douren Faye" data-level="32"></option>
+                <option value="Chanco, Camille Andrea" data-level="32"></option>
+                <option value="Cinco, Janna Kimberly" data-level="32"></option>
+                <option value="Cofreros, Aina Chrysty" data-level="32"></option>
+                <option value="Comidoy, Jelianah Edbern" data-level="32"></option>
+                <option value="Cosare, Diana" data-level="32"></option>
+                <option value="De Luna, Mia" data-level="32"></option>
+                <option value="Dela Cruz, Kentram Kirk" data-level="32"></option>
+                <option value="Desalisa, Louel" data-level="32"></option>
+                <option value="Enoc, Neil Sebastian" data-level="32"></option>
+                <option value="Estigoy, Marc David" data-level="32"></option>
+                <option value="Fariñas, Ma. Angeli" data-level="32"></option>
+                <option value="Gabule, Xiarleene Faith" data-level="32"></option>
+                <option value="Havana, Keren" data-level="32"></option>
+                <option value="Herrero, John Austin" data-level="32"></option>
+                <option value="Josol, Theodore Gregorae" data-level="32"></option>
+                <option value="Karamihan, Ma. Andrea" data-level="32"></option>
+                <option value="Lim, Jonah Janeloie" data-level="32"></option>
+                <option value="Lim, Kristina" data-level="32"></option>
+                <option value="Lopez, Jairah" data-level="32"></option>
+                <option value="Lozada, Emerald" data-level="32"></option>
+                <option value="Lucena, Alyana Kloe" data-level="32"></option>
+                <option value="Maloloy-on, Miguel" data-level="32"></option>
+                <option value="Manzano, Melody Regine" data-level="32"></option>
+                <option value="Manquilan, Ramil" data-level="32"></option>
+                <option value="Montero, Reynor" data-level="32"></option>
+                <option value="Nuncio, Cristy Ian Mae" data-level="32"></option>
+                <option value="Olea, Justin Joseph" data-level="32"></option>
+                <option value="Ordaneza, Alyxxa Femme" data-level="32"></option>
+                <option value="Peñaflor, Christine" data-level="32"></option>
+                <option value="Quimco, Marie Louise" data-level="32"></option>
+                <option value="Quinto, Raymarj" data-level="32"></option>
+                <option value="Quisaot, Michael Dave" data-level="32"></option>
+                <option value="Rajiv, Zayreem" data-level="32"></option>
+                <option value="Raymundo, Frenzy" data-level="32"></option>
+                <option value="Ronquillo, Cecilia" data-level="32"></option>
+                <option value="Sablas, Mary Mae" data-level="32"></option>
+                <option value="Samson, Niel John" data-level="32"></option>
+                <option value="Tan, Rochelle Faye" data-level="32"></option>
+                <option value="Tiamson, Leanza Joy" data-level="32"></option>
+                <option value="Tuastumban, Andrew" data-level="32"></option>
+                <option value="Turtor, DM Angelo" data-level="32"></option>
+                <option value="Veroy, Jimarie" data-level="32"></option>
+                <option value="Vienes, Aiza" data-level="32"></option>
+                <option value="Villena, Lhara" data-level="32"></option>
+                <option value="Ababao, Stephen" data-level="31"></option>
+                <option value="Ababon, Juzel" data-level="31"></option>
+                <option value="Adarna, Alvina Diane" data-level="31"></option>
+                <option value="Alejo, Accelrose" data-level="31"></option>
+                <option value="Alibaer, Alayeza" data-level="31"></option>
+                <option value="Alintajan, Shenna May" data-level="31"></option>
+                <option value="Aliponga, Marveline" data-level="31"></option>
+                <option value="Almadin, Charlette Agatha" data-level="31"></option>
+                <option value="Amboayan, Vangie" data-level="31"></option>
+                <option value="Ancheta, Jermaine Anne" data-level="31"></option>
+                <option value="Andi, Rahila Ashra" data-level="31"></option>
+                <option value="Andres, Jasper Ian" data-level="31"></option>
+                <option value="Apal, Ceasar Ceriaco" data-level="31"></option>
+                <option value="Aragon, Harold James" data-level="31"></option>
+                <option value="Araneta, Yit Crisdy Ann" data-level="31"></option>
+                <option value="Arcenas, Mark Bryan" data-level="31"></option>
+                <option value="Asentista, Keisha Cheyne" data-level="31"></option>
+                <option value="Asibal, Edwin Collin II" data-level="31"></option>
+                <option value="Atienza, Irs Reiv" data-level="31"></option>
+                <option value="Aurelio, Jucyl Joy" data-level="31"></option>
+                <option value="Añasco, Khrizia Claire" data-level="31"></option>
+                <option value="Bagcal, John Bryan" data-level="31"></option>
+                <option value="Balingit, Phoebe" data-level="31"></option>
+                <option value="Bayani, Lyka Tiffany" data-level="31"></option>
+                <option value="Bretaña, Bridgette Elaiza" data-level="31"></option>
+                <option value="Calanao, Jason Don" data-level="31"></option>
+                <option value="Calog, Edelweiss" data-level="31"></option>
+                <option value="Cantil, Adriane" data-level="31"></option>
+                <option value="Casanaan, Eric John" data-level="31"></option>
+                <option value="Castillo, Mel Andrea" data-level="31"></option>
+                <option value="Catedrilla, Daniela" data-level="31"></option>
+                <option value="Clam, Princess Audrey " data-level="31"></option>
+                <option value="Concepcion, Kriz Dexter Jonz" data-level="31"></option>
+                <option value="Cruiz, Nicole Shaine" data-level="31"></option>
+                <option value="Cruz, Arlyn" data-level="31"></option>
+                <option value="De Guzman, Alexa Marie" data-level="31"></option>
+                <option value="Deligero, Meljubille" data-level="31"></option>
+                <option value="Delute, Franzine Kate" data-level="31"></option>
+                <option value="Deocampo, Jenny" data-level="31"></option>
+                <option value="Dequiña, Cielo" data-level="31"></option>
+                <option value="Desebayla, Junayah Reyca" data-level="31"></option>
+                <option value="Diola, Mae Ann" data-level="31"></option>
+                <option value="Dolido, Kevin" data-level="31"></option>
+                <option value="Dumadangon, Julia Sophia" data-level="31"></option>
+                <option value="Dumago, Raymond" data-level="31"></option>
+                <option value="Ellazo, Vince Ceazar" data-level="31"></option>
+                <option value="Elpa, Chrisanta Manuale" data-level="31"></option>
+                <option value="Espinosa, Alex Brent" data-level="31"></option>
+                <option value="Espinosa, Catherine Joy" data-level="31"></option>
+                <option value="Estroga, Heurika Jane" data-level="31"></option>
+                <option value="Eviota, Arlisa" data-level="31"></option>
+                <option value="Frani, Nathaniel" data-level="31"></option>
+                <option value="Gabunales, Kathleen" data-level="31"></option>
+                <option value="Galanto, Princess Marie" data-level="31"></option>
+                <option value="Gambong, Tecia Rose" data-level="31"></option>
+                <option value="Ganados, Carl Julahn" data-level="31"></option>
+                <option value="Ganot, Geonice" data-level="31"></option>
+                <option value="Genilla, Britney" data-level="31"></option>
+                <option value="Goloran, Mika Elah" data-level="31"></option>
+                <option value="Grefalde, Faith Eva" data-level="31"></option>
+                <option value="Hadcan, Edlalyn" data-level="31"></option>
+                <option value="Hermocilla, Joycemae" data-level="31"></option>
+                <option value="Hernandez, Jin Paolo" data-level="31"></option>
+                <option value="Herrera, Jhanna Margarita" data-level="31"></option>
+                <option value="Ibale, Aldae Wayne" data-level="31"></option>
+                <option value="Ibero, Francis Dolf" data-level="31"></option>
+                <option value="Ilago, Hiroshi Jay" data-level="31"></option>
+                <option value="Isip, Reuel Francis" data-level="31"></option>
+                <option value="Istafanos, Adrian" data-level="31"></option>
+                <option value="Jupia, Claudine" data-level="31"></option>
+                <option value="Ko Kam, Alex Emmanuel" data-level="31"></option>
+                <option value="Laurente, Christian Jon" data-level="31"></option>
+                <option value="Librando, Andrea Joy" data-level="31"></option>
+                <option value="Lim, Gracie Mae" data-level="31"></option>
+                <option value="Limpot, Blessy" data-level="31"></option>
+                <option value="Limpot, Jeff Ruel" data-level="31"></option>
+                <option value="Llena, Chrismarie" data-level="31"></option>
+                <option value="Lomboy, Jelyn Mae" data-level="31"></option>
+                <option value="Loquias, Valorie Ann" data-level="31"></option>
+                <option value="Luna, Christian Lloyd" data-level="31"></option>
+                <option value="Macaraguit, Settie Danielle" data-level="31"></option>
+                <option value="Magtana, Deodelyn" data-level="31"></option>
+                <option value="Mallo, Knor Dyne" data-level="31"></option>
+                <option value="Mamac, Immanuel Fritz" data-level="31"></option>
+                <option value="Mangmang, Eva Saffron" data-level="31"></option>
+                <option value="Mansigue, Angelika" data-level="31"></option>
+                <option value="Matba, Mufreeza" data-level="31"></option>
+                <option value="Mencidor, Carla Nichole" data-level="31"></option>
+                <option value="Mendoza, Jade Nicole" data-level="31"></option>
+                <option value="Monta, Justine Belle" data-level="31"></option>
+                <option value="Montecino, Marieton Mae" data-level="31"></option>
+                <option value="Moralde, Ma. Jullana Grace" data-level="31"></option>
+                <option value="Musa, Bai Rania" data-level="31"></option>
+                <option value="Navarro, Ydolvise Hanzly" data-level="31"></option>
+                <option value="Nelmida, Ric Angelo" data-level="31"></option>
+                <option value="Oliva, Alexandra Nicole" data-level="31"></option>
+                <option value="Orillo, Einstein" data-level="31"></option>
+                <option value="Ortega, Joanna Mirian" data-level="31"></option>
+                <option value="Paglinawan, Maefel Ruth" data-level="31"></option>
+                <option value="Pambid, Amidah" data-level="31"></option>
+                <option value="Paniza, Rielle Alaine" data-level="31"></option>
+                <option value="Pasadilla, Irish Claire" data-level="31"></option>
+                <option value="Perandos, Christian Manuel" data-level="31"></option>
+                <option value="Perol, Nicolle" data-level="31"></option>
+                <option value="Ponferrada, Alleah Claire" data-level="31"></option>
+                <option value="Pradi, Faith Angelique" data-level="31"></option>
+                <option value="Quiao, Tresha Mae" data-level="31"></option>
+                <option value="Remotin, Kristine" data-level="31"></option>
+                <option value="Revano, Joanne Kyla" data-level="31"></option>
+                <option value="Reyes, Stanley Joane" data-level="31"></option>
+                <option value="Roa, Hernan Anthony" data-level="31"></option>
+                <option value="Rojas, Jessa Mae" data-level="31"></option>
+                <option value="Roque, Exekiel Mateo" data-level="31"></option>
+                <option value="Salcedo, Ma. Isabel" data-level="31"></option>
+                <option value="Salvador, Emanuel" data-level="31"></option>
+                <option value="Sambrano, Michael John" data-level="31"></option>
+                <option value="Santander, Russel Jay" data-level="31"></option>
+                <option value="Santiago, Clint David" data-level="31"></option>
+                <option value="Sarona, Gem Dandy May" data-level="31"></option>
+                <option value="Sibag, Jestoni" data-level="31"></option>
+                <option value="Sierra, Kenneth Joshua" data-level="31"></option>
+                <option value="Tanaka, Honey Jean" data-level="31"></option>
+                <option value="Tanjili, Roquiza" data-level="31"></option>
+                <option value="Tare, Gem Princess" data-level="31"></option>
+                <option value="Timbreza, Erwin" data-level="31"></option>
+                <option value="Tindoy, Krisceline Joy" data-level="31"></option>
+                <option value="Toghyani, Pezhman" data-level="31"></option>
+                <option value="Ungab, Shaira Jade" data-level="31"></option>
+                <option value="Villanueva, Phoebe Kaye" data-level="31"></option>
+                <option value="Villarazo, Gio Paolo" data-level="31"></option>
+              </datalist>
+            </div>
+          </div>
+          <div class="row" style="grid-template-columns:1fr;">
+            <div>
+              <label>Clinical Procedure</label>
+              <input id="clinicalProcedure" type="text" placeholder="Enter clinical procedure" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" id="addResultBtn">Add to Results</button>
+            <button class="btn btn-muted" id="clearFormBtn" type="button">Clear Form</button>
+          </div>
+        </form>
+
+        <div class="toolbar">
+          <button class="btn" id="printBtn" type="button">Print Table</button>
+          <button class="btn" id="csvBtn" type="button">Save CSV</button>
+          <button class="btn btn-danger" id="resetBtn" type="button">Reset Results</button>
+        </div>
+        <div class="note">“Completed” column is intentionally blank so you can fill it later.</div>
+      </section>
+
+      <!-- Simulator Timer Section -->
+      <section class="card">
+        <h3 style="margin:0 0 8px">Simulator Timer (Chairs 1 - 45)</h3>
+        <div class="timer-control-panel">
+          <div>
+            <label for="timerChairSelect">Select Chair:</label>
+            <select id="timerChairSelect" style="padding:8px; border-radius:8px; border:1px solid #dfe3e8; margin-top:4px;"></select>
+          </div>
+          <div style="flex-grow: 1;">
+            <label>Quick Actions:</label>
+            <div class="timer-buttons">
+              <button class="timer-btn" onclick="applyTimeToSelectedChair(3600)">Start 1hr.</button>
+              <button class="timer-btn" onclick="applyTimeToSelectedChair(7200)">Start 2hrs.</button>
+              <button class="timer-btn" onclick="applyTimeToSelectedChair(10800)">Start 3hrs.</button>
+              <button class="timer-btn" onclick="applyTimeToSelectedChair(14400)">Start 4hrs.</button>
+              <button class="timer-btn" onclick="applyTimeToSelectedChair(18000)">Start 5hrs.</button>
+              <button class="timer-btn timer-btn-inc" onclick="addTimeToSelectedChair(300)">+5mins</button>
+              <button class="timer-btn timer-btn-inc" onclick="addTimeToSelectedChair(600)">+10mins</button>
+              <button class="timer-btn timer-btn-inc" onclick="addTimeToSelectedChair(1800)">+30mins</button>
+              <button class="timer-btn timer-btn-stop" onclick="stopSelectedChairTimer()">Stop / Reset</button>
+            </div>
+          </div>
+        </div>
+        <div id="chairsGrid" class="chairs-grid"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <section class="card" style="margin-top:16px;">
+    <h3 style="margin:0 0 8px">Results</h3>
+    <table id="resultsTable" aria-label="Results table">
+      <thead>
+        <tr>
+          <th>Your Clinical Instructor</th>
+          <th>Clinician Name</th>
+          <th>Clinical Level</th>
+          <th>Time/Date Taken</th>
+          <th>Clinical Procedure</th>
+          <th>Completed</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </section>
+</div>
+
+<script>
+const LS_KEYS = { NAMES:'ci_wheel_names_v4', RESULTS:'ci_results_v4', TIMERS:'ci_timers_v4', WAITLIST:'ci_waitlist_v4', SAVED_NAMES:'ci_saved_names_v4' };
+let names=[], colors=[], pickedName='', startAngle=0, arc=0, spinning=false, ctx;
+const SPIN_DURATION=5000;
+const ALL_INSTRUCTORS=[
+  "Dr. Macadangdang","Dr. Belicario","Dr. Malinao","Dr. Marimon","Dr. Barniego","Dr. Cunanan","Dr. Banzon",
+  "Dr. Capili","Dr. Romero","Dr. Herrero","Dr. Jacob","Dr. Deiparine","Dr. Pastoriza","Dr. Babiera",
+  "Dr. Ampuan","Dr. Kimble","Dr. Kimpo","Dr. Calvario","Dr. Pareñas","Dr. Batac","Dr. Delosa"
+];
+
+const wheel=document.getElementById('wheel');
+const tagBox=document.getElementById('tagBox');
+const instructorGrid=document.getElementById("instructorGrid");
+const pickedInstructorInput=document.getElementById('pickedInstructor');
+const levelSelect=document.getElementById('clinicalLevel');
+const clinicianNameInput=document.getElementById('clinicianName');
+const clinicianList=document.getElementById('clinicianList');
+const procedureInput=document.getElementById('clinicalProcedure');
+const addResultBtn=document.getElementById('addResultBtn');
+const clearFormBtn=document.getElementById('clearFormBtn');
+const printBtn=document.getElementById('printBtn');
+const csvBtn=document.getElementById('csvBtn');
+const resetBtn=document.getElementById('resetBtn');
+const spinBtn=document.getElementById('spinBtn');
+const removePickedBtn=document.getElementById('removePickedBtn');
+const resultsBody=document.getElementById('resultsBody');
+const timerChairSelect = document.getElementById('timerChairSelect');
+const chairsGrid = document.getElementById('chairsGrid');
+
+// Waiting list elements
+const waitClinicianNameInput = document.getElementById('waitClinicianName');
+const waitProcedureInput = document.getElementById('waitProcedure');
+const addToWaitlistBtn = document.getElementById('addToWaitlistBtn');
+const waitlistBody = document.getElementById('waitlistBody');
+const waitlistCard = document.getElementById('waitlistCard');
+const toggleWaitlistBtn = document.getElementById('toggleWaitlistBtn');
+
+// Settings / Wheel buttons
+const saveInstructorsBtn = document.getElementById('saveInstructorsBtn');
+const resetInstructorsBtn = document.getElementById('resetInstructorsBtn');
+const removeAllBtn = document.getElementById('removeAllBtn');
+
+// Simulator Timers State (Chairs 1 to 45)
+let chairTimers = {};
+
+/* ---------- Utilities ---------- */
+function saveNames(){localStorage.setItem(LS_KEYS.NAMES,JSON.stringify(names));}
+function loadNames(){try{return JSON.parse(localStorage.getItem(LS_KEYS.NAMES)||'null')}catch{return null}}
+function saveResults(){
+  const rows=[]; resultsBody.querySelectorAll("tr[data-row='true']").forEach(tr=>{
+    const cells=tr.querySelectorAll('td');
+    rows.push({instructor:cells[0].innerText.trim(),clinician:cells[1].innerText.trim(),
+      level:cells[2].innerText.trim(),
+      datetime:cells[3].innerText.trim(),procedure:cells[4].innerText.trim(),
+      completed:cells[5].innerText.trim()});
+  });
+  localStorage.setItem(LS_KEYS.RESULTS,JSON.stringify(rows));
+}
+function loadResults(){try{return JSON.parse(localStorage.getItem(LS_KEYS.RESULTS)||'[]')}catch{return []}}
+function randColor(){return `hsl(${Math.floor(Math.random()*360)} 75% 50%)`;}
+function formatNow(){return new Date().toLocaleString();}
+
+function updateClinicianLevelForInput(inputElem) {
+  const val = inputElem.value;
+  const options = clinicianList.options;
+  for (let i = 0; i < options.length; i++) {
+    if (options[i].value === val) {
+      const level = options[i].getAttribute('data-level');
+      if (level) {
+        levelSelect.value = level;
+      }
+      break;
+    }
+  }
+}
+
+/* ---------- Wheel Instructors ---------- */
+function renderTags(){
+  tagBox.innerHTML='';
+  names.forEach(n=>{
+    const tag=document.createElement('span');
+    tag.className='tag'; tag.innerHTML=`<span>${n}</span><button>❌</button>`;
+    tag.querySelector('button').onclick=()=>{
+      removeInstructor(n);
+      const btn=[...document.querySelectorAll(".instructor-btn")].find(b=>b.textContent===n);
+      if(btn) btn.disabled=false;
+    };
+    tagBox.appendChild(tag);
+  });
+  updateInstructorGridStates();
+}
+function updateInstructorGridStates(){
+  document.querySelectorAll(".instructor-btn").forEach(btn=>{
+    if(names.includes(btn.textContent)){
+      btn.disabled=true;
+    } else {
+      btn.disabled=false;
+    }
+  });
+}
+function addInstructor(name){if(!name||names.includes(name))return;names.push(name);colors.push(randColor());saveNames();renderTags();drawWheel();}
+function removeInstructor(name){const i=names.indexOf(name);if(i>-1){names.splice(i,1);colors.splice(i,1);if(pickedName===name){pickedName='';pickedInstructorInput.value='';removePickedBtn.disabled=true;}saveNames();renderTags();drawWheel();}}
+
+/* ---------- Wheel Settings: Save, Reset, Remove All ---------- */
+function saveInstructorPreset(){
+  if(names.length === 0){ alert('No instructors currently on the wheel to save.'); return; }
+  localStorage.setItem(LS_KEYS.SAVED_NAMES, JSON.stringify(names));
+  alert('Current wheel instructors saved successfully!');
+}
+
+function resetInstructorsToSaved(){
+  const saved = JSON.parse(localStorage.getItem(LS_KEYS.SAVED_NAMES) || '[]');
+  if(saved.length === 0){
+    names = [...ALL_INSTRUCTORS];
+  } else {
+    names = [...saved];
+  }
+  colors = names.map(()=>randColor());
+  saveNames();
+  renderTags();
+  drawWheel();
+  alert('Wheel instructors have been reset/restored!');
+}
+
+function removeAllInstructors(){
+  if(confirm('Are you sure you want to remove all instructors from the wheel?')){
+    names = [];
+    colors = [];
+    saveNames();
+    renderTags();
+    drawWheel();
+  }
+}
+
+/* ---------- Waiting List Functions ---------- */
+function loadWaitlist(){try{return JSON.parse(localStorage.getItem(LS_KEYS.WAITLIST)||'[]')}catch{return []}}
+function saveWaitlist(list){localStorage.setItem(LS_KEYS.WAITLIST, JSON.stringify(list));}
+
+function renderWaitlist(){
+  const list = loadWaitlist();
+  waitlistBody.innerHTML = '';
+  if(list.length === 0){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="3" style="color:#888;">No items in waiting list</td>`;
+    waitlistBody.appendChild(tr);
+    return;
+  }
+  list.forEach((item, index)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.clinician}</td>
+      <td>${item.procedure}</td>
+      <td class="actions"><button class="btn" type="button" style="padding:4px 8px; font-size:12px;">Add</button></td>
+    `;
+    tr.querySelector('button').onclick = () => {
+      clinicianNameInput.value = item.clinician;
+      updateClinicianLevelForInput(clinicianNameInput);
+      procedureInput.value = item.procedure;
+
+      list.splice(index, 1);
+      saveWaitlist(list);
+      renderWaitlist();
+    };
+    waitlistBody.appendChild(tr);
+  });
+}
+
+function addToWaitlist(){
+  const clinician = waitClinicianNameInput.value.trim();
+  const procedure = waitProcedureInput.value.trim();
+
+  if(!clinician || !procedure){
+    alert('Please fill in all waiting list fields.');
+    return;
+  }
+
+  const list = loadWaitlist();
+  list.push({ clinician, procedure });
+  saveWaitlist(list);
+  renderWaitlist();
+
+  waitClinicianNameInput.value = '';
+  waitProcedureInput.value = '';
+}
+
+/* ---------- Wheel Drawing ---------- */
+function drawWheel(){
+  const w=wheel.width,h=wheel.height,cx=w/2,cy=h/2,radius=Math.min(cx,cy)-4;
+  if(!ctx)ctx=wheel.getContext('2d'); ctx.clearRect(0,0,w,h);
+  if(names.length===0){ctx.fillStyle='#90a4ae';ctx.font='14px Arial';ctx.textAlign='center';ctx.fillText('Add Clinical Instructors and spin!',cx,cy);return;}
+  arc=Math.PI/(names.length/2);
+  for(let i=0;i<names.length;i++){const angle=startAngle+i*arc;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,radius,angle,angle+arc,false);ctx.closePath();ctx.fillStyle=colors[i];ctx.fill();}
+  ctx.save();ctx.fillStyle='#fff';ctx.font='bold 14px Arial';
+  for(let i=0;i<names.length;i++){const angle=startAngle+i*arc,mid=angle+arc/2,tx=cx+Math.cos(mid)*radius*0.65,ty=cy+Math.sin(mid)*radius*0.65;
+    ctx.save();ctx.translate(tx,ty);ctx.rotate(mid);let text=names[i],fontSize=14;ctx.font=`bold ${fontSize}px Arial`;
+    while(ctx.measureText(text).width>radius*0.9&&fontSize>10){fontSize--;ctx.font=`bold ${fontSize}px Arial`;}
+    ctx.fillText(text,-ctx.measureText(text).width/2,0);ctx.restore();}
+  ctx.restore();
+}
+function easeOutCubic(t){return 1-Math.pow(1-t,3);}
+function spin(){if(spinning||names.length===0){if(names.length===0)alert('Add Clinical Instructors first');return;}
+  spinning=true;spinBtn.disabled=true;const start=performance.now(),initialAngle=startAngle,extra=6+Math.random()*2;
+  function frame(now){const t=Math.min((now-start)/SPIN_DURATION,1),e=easeOutCubic(t);startAngle=initialAngle+e*(extra*2*Math.PI);drawWheel();if(t<1)requestAnimationFrame(frame);else{spinning=false;spinBtn.disabled=false;finalizePick();}}
+  requestAnimationFrame(frame);}
+function finalizePick(){const deg=(startAngle*180/Math.PI+90)%360,arcd=arc*180/Math.PI;let i=Math.floor((360-deg)/arcd)%names.length;if(i<0)i+=names.length;pickedName=names[i];pickedInstructorInput.value=pickedName;removePickedBtn.disabled=false;}
+function removePickedFromWheel(){if(!pickedName)return;removeInstructor(pickedName);pickedName='';pickedInstructorInput.value='';removePickedBtn.disabled=true;}
+
+/* ---------- Results Table ---------- */
+function addResult(){
+  const instructor=pickedInstructorInput.value.trim(),clinician=clinicianNameInput.value.trim(),
+        level=levelSelect.value,procedure=procedureInput.value.trim();
+  if(!instructor||!clinician||!procedure){alert('Fill all fields');return;}
+  const now=formatNow(),row={instructor,clinician,level,datetime:now,procedure,completed:""};
+  const rows=loadResults();rows.push(row);localStorage.setItem(LS_KEYS.RESULTS,JSON.stringify(rows));rebuildResultsFromStorage();
+  
+  if(names.includes(instructor)){
+    removeInstructor(instructor);
+  }
+  pickedInstructorInput.value='';
+  pickedName='';
+}
+function printTable(){const html=document.getElementById('resultsTable').outerHTML,w=window.open('','','width=1200,height=800');
+  w.document.write(`<html><head><title>Print Results</title><style>@page{size:landscape;margin:20px;}table{width:100%;border-collapse:collapse}th,td{border:1px solid #aaa;padding:8px;text-align:center}thead th{background:#eee}.actions{display:none}</style></head><body>${html}</body></html>`);w.document.close();w.print();}
+function saveCSV(){let csv='Instructor,Clinician,Level,Time/Date,Procedure,Completed\n';
+  resultsBody.querySelectorAll('tr[data-row="true"]').forEach(tr=>{const tds=tr.querySelectorAll('td');csv+=Array.from(tds).slice(0,6).map(td=>`"${td.innerText.replace(/"/g,'""')}"`).join(',')+'\n';});
+  const blob=new Blob([csv],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='results.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+
+function rebuildResultsFromStorage(){
+  const rows=loadResults();resultsBody.innerHTML='';
+  const grouped={};rows.forEach(r=>{const ins=r.instructor||"Unknown";if(!grouped[ins])grouped[ins]=[];grouped[ins].push(r);});
+  Object.keys(grouped).forEach(ins=>{
+    const headerRow=document.createElement('tr');
+    headerRow.classList.add("group-header");
+    const count = grouped[ins].length;
+    headerRow.innerHTML=`<td colspan="7" style="background:#e3f2fd;font-weight:bold;text-align:left;">
+      <span class="arrow">▼</span> Clinical Instructor: ${ins}
+      <span style="float: right; font-weight: normal; font-size: 13px; color: #0d47a1; background: #bbdefb; padding: 2px 8px; border-radius: 10px;">
+        Clinicians: ${count}
+      </span>
+    </td>`;
+    resultsBody.appendChild(headerRow);
+    grouped[ins].forEach(r=>{
+      const tr=document.createElement('tr');tr.setAttribute("data-row","true");tr.setAttribute("data-group",ins);
+      tr.innerHTML=`<td contenteditable="true">${r.instructor||''}</td>
+        <td contenteditable="true">${r.clinician||''}</td>
+        <td contenteditable="true">${r.level||''}</td>
+        <td contenteditable="true">${r.datetime||''}</td>
+        <td contenteditable="true">${r.procedure||''}</td>
+        <td contenteditable="true">${r.completed||''}</td>
+        <td class="actions"><button class="btn btn-danger" type="button">Delete</button></td>`;
+      tr.querySelector('.actions .btn').onclick=()=>{tr.remove();saveResults();rebuildResultsFromStorage();};
+      tr.querySelectorAll('td[contenteditable="true"]').forEach(td=>{td.addEventListener('input',()=>{saveResults();});td.addEventListener('blur',()=>{saveResults();});});
+      resultsBody.appendChild(tr);
+    });
+    headerRow.addEventListener("click",()=>{
+      const rows=document.querySelectorAll(`tr[data-group="${ins}"]`);
+      const arrow=headerRow.querySelector(".arrow");
+      const hidden=[...rows].every(r=>r.style.display==="none");
+      if(hidden){rows.forEach(r=>r.style.display="");arrow.textContent="▼";}
+      else{rows.forEach(r=>r.style.display="none");arrow.textContent="▶";}
+    });
+  });
+}
+
+/* ---------- Simulator Timers Logic ---------- */
+function initTimers(){
+  timerChairSelect.innerHTML = '';
+  for(let i=1; i<=45; i++){
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Chair ${i}`;
+    timerChairSelect.appendChild(opt);
+  }
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_KEYS.TIMERS) || '{}');
+    const now = Date.now();
+    for(let i=1; i<=45; i++){
+      if(saved[i] && saved[i].endTime > now){
+        chairTimers[i] = { endTime: saved[i].endTime };
+      }
+    }
+  } catch(e){}
+
+  renderChairsGrid();
+  setInterval(updateTimersTick, 1000);
+}
+
+function renderChairsGrid(){
+  chairsGrid.innerHTML = '';
+  const now = Date.now();
+  for(let i=1; i<=45; i++){
+    const card = document.createElement('div');
+    card.className = 'chair-card';
+    card.onclick = () => { timerChairSelect.value = i; };
+    
+    const title = document.createElement('div');
+    title.className = 'chair-title';
+    title.textContent = `Chair ${i}`;
+    card.appendChild(title);
+
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'chair-time';
+    
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'chair-status';
+
+    if(chairTimers[i] && chairTimers[i].endTime > now){
+      const diff = Math.ceil((chairTimers[i].endTime - now) / 1000);
+      const h = Math.floor(diff / 3600);
+      const m = Math.floor((diff % 3600) / 60);
+      const s = diff % 60;
+      timeDiv.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      card.classList.add('active');
+      statusDiv.textContent = 'Running';
+    } else if(chairTimers[i] && chairTimers[i].endTime <= now){
+      timeDiv.textContent = '00:00:00';
+      card.classList.add('expired');
+      statusDiv.textContent = 'Time Up!';
+    } else {
+      timeDiv.textContent = '00:00:00';
+      statusDiv.textContent = 'Idle';
+    }
+
+    card.appendChild(timeDiv);
+    card.appendChild(statusDiv);
+    chairsGrid.appendChild(card);
+  }
+}
+
+function applyTimeToSelectedChair(seconds){
+  const chairNum = timerChairSelect.value;
+  const endTime = Date.now() + (seconds * 1000);
+  chairTimers[chairNum] = { endTime };
+  saveTimersStorage();
+  renderChairsGrid();
+}
+
+function addTimeToSelectedChair(seconds){
+  const chairNum = timerChairSelect.value;
+  const now = Date.now();
+  if(chairTimers[chairNum] && chairTimers[chairNum].endTime > now){
+    chairTimers[chairNum].endTime += (seconds * 1000);
+  } else {
+    chairTimers[chairNum] = { endTime: now + (seconds * 1000) };
+  }
+  saveTimersStorage();
+  renderChairsGrid();
+}
+
+function stopSelectedChairTimer(){
+  const chairNum = timerChairSelect.value;
+  delete chairTimers[chairNum];
+  saveTimersStorage();
+  renderChairsGrid();
+}
+
+function saveTimersStorage(){
+  localStorage.setItem(LS_KEYS.TIMERS, JSON.stringify(chairTimers));
+}
+
+function updateTimersTick(){
+  let needsRedraw = false;
+  const now = Date.now();
+  for(let i in chairTimers){
+    if(chairTimers[i].endTime <= now + 1000){
+      needsRedraw = true;
+    }
+  }
+  if(needsRedraw || Object.keys(chairTimers).length > 0){
+    renderChairsGrid();
+  }
+}
+
+/* ---------- Init ---------- */
+function init(){
+  const loadedNames = loadNames();
+  names = loadedNames !== null ? loadedNames : [];
+  colors = names.map(()=>randColor());
+  
+  renderTags();
+  drawWheel();
+  rebuildResultsFromStorage();
+  renderWaitlist();
+
+  ALL_INSTRUCTORS.forEach(name=>{
+    const btn=document.createElement("button");
+    btn.className="instructor-btn";
+    btn.textContent=name;
+    btn.onclick=()=>{addInstructor(name);btn.disabled=true;};
+    if(names.includes(name))btn.disabled=true;
+    instructorGrid.appendChild(btn);
+  });
+  
+  clinicianNameInput.addEventListener('input', (e) => {
+    updateClinicianLevelForInput(e.target);
+  });
+
+  spinBtn.onclick=spin;
+  removePickedBtn.onclick=removePickedFromWheel;
+  addResultBtn.onclick=addResult;
+  clearFormBtn.onclick=()=>{clinicianNameInput.value='';procedureInput.value='';};
+  printBtn.onclick=printTable;
+  csvBtn.onclick=saveCSV;
+  resetBtn.onclick=()=>{if(confirm('Clear all rows?')){resultsBody.innerHTML='';localStorage.removeItem(LS_KEYS.RESULTS);}};
+
+  // New buttons bindings
+  saveInstructorsBtn.onclick = saveInstructorPreset;
+  resetInstructorsBtn.onclick = resetInstructorsToSaved;
+  removeAllBtn.onclick = removeAllInstructors;
+  addToWaitlistBtn.onclick = addToWaitlist;
+
+  // Open / Close Waiting List toggle functionality with dynamic text changing
+  toggleWaitlistBtn.onclick = () => {
+    if(waitlistCard.style.display === 'none'){
+      waitlistCard.style.display = 'block';
+      toggleWaitlistBtn.textContent = 'Close Waiting List';
+    } else {
+      waitlistCard.style.display = 'none';
+      toggleWaitlistBtn.textContent = 'Open Waiting List';
+    }
+  };
+
+  initTimers();
+}
+init();
+</script>
+</body>
+</html>
