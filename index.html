@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TYPO/CAST Clinical Instructors</title>
+<title>TYPO CAST Clinical Instructors</title>
 <style>
   :root{
     --primary:#1e88e5;
@@ -481,7 +481,7 @@
           <button class="btn" id="csvBtn" type="button">Save CSV</button>
           <button class="btn btn-danger" id="resetBtn" type="button">Reset Results</button>
         </div>
-        <div class="note">¡°Completed¡± column is intentionally blank so you can fill it later.</div>
+        <div class="note">Â¡Â°CompletedÂ¡Â± column is intentionally blank so you can fill it later.</div>
       </section>
     </div>
   </div>
@@ -705,7 +705,7 @@ function rebuildResultsFromStorage(){
     headerRow.classList.add("group-header");
     const count = grouped[ins].length;
     headerRow.innerHTML=`<td colspan="7" style="background:#e3f2fd;font-weight:bold;text-align:left;">
-      <span class="arrow">¨‹</span> Clinical Instructor: ${ins}
+      <span class="arrow">Â¨Â‹</span> Clinical Instructor: ${ins}
       <span style="float: right; font-weight: normal; font-size: 13px; color: #0d47a1; background: #bbdefb; padding: 2px 8px; border-radius: 10px;">
         Clinicians: ${count}
       </span>
@@ -728,7 +728,7 @@ function rebuildResultsFromStorage(){
       const rows=document.querySelectorAll(`tr[data-group="${ins}"]`);
       const arrow=headerRow.querySelector(".arrow");
       const hidden=[...rows].every(r=>r.style.display==="none");
-      if(hidden){rows.forEach(r=>r.style.display="");arrow.textContent="¨‹";}
+      if(hidden){rows.forEach(r=>r.style.display="");arrow.textContent="Â¨Â‹";}
       else{rows.forEach(r=>r.style.display="none");arrow.textContent="?";}
     });
   });
